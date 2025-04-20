@@ -11,6 +11,10 @@ properties([
 ])
 pipeline {
     agent any
+    
+     tools {
+        git 'Default'  // This should match the name in Jenkins global Git config
+    }
     stages {
         stage('Preparing') {
             steps {
@@ -19,26 +23,26 @@ pipeline {
         }
         stage('Git Pulling') {
             steps {
-                git branch: 'master', url: 'https://github.com/AmanPathak-DevOps/EKS-Terraform-GitHub-Actions.git'
+                git branch: 'master', url: 'https://github.com/singampallinanda/EKS-Terraform-GitHub-Actions'
             }
         }
         stage('Init') {
             steps {
-                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                withAWS(credentials: 'aws-cred', region: 'ap-south-1') {
                 sh 'terraform -chdir=eks/ init'
                 }
             }
         }
         stage('Validate') {
             steps {
-                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                withAWS(credentials: 'aws-cred', region: 'ap-south-1') {
                 sh 'terraform -chdir=eks/ validate'
                 }
             }
         }
         stage('Action') {
             steps {
-                withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                withAWS(credentials: 'aws-cred', region: 'ap-south-1') {
                     script {    
                         if (params.Terraform_Action == 'plan') {
                             sh "terraform -chdir=eks/ plan -var-file=${params.Environment}.tfvars"
